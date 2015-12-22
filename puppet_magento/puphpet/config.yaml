@@ -1,0 +1,393 @@
+vagrantfile:
+    target: local
+    vm:
+        box: puphpet/ubuntu1404-x64
+        box_url: puphpet/ubuntu1404-x64
+        hostname: magento
+        memory: '1024'
+        cpus: '1'
+        chosen_provider: virtualbox
+        network:
+            private_network: 192.168.56.102
+            forwarded_port:
+                vflnp_szmnhg2qqq5c:
+                    host: '8084'
+                    guest: '22'
+                vflnp_zcqh64o0u19n:
+                    host: '3306'
+                    guest: '3306'
+        post_up_message: ''
+        provider:
+            virtualbox:
+                modifyvm:
+                    natdnshostresolver1: 'on'
+                showgui: '0'
+            vmware:
+                numvcpus: 1
+            parallels:
+                cpus: 1
+        provision:
+            puppet:
+                manifests_path: puphpet/puppet
+                manifest_file: site.pp
+                module_path: puphpet/puppet/modules
+                options:
+                    - '--verbose'
+                    - '--hiera_config /vagrant/puphpet/puppet/hiera.yaml'
+                    - '--parser future'
+        synced_folder:
+            vflsf_if7fjap745n3n:
+                source: ../
+                target: /www/magento
+                sync_type: default
+                smb:
+                    smb_host: ''
+                    smb_username: ''
+                    smb_password: ''
+                rsync:
+                    args:
+                        - '--verbose'
+                        - '--archive'
+                        - '-z'
+                    exclude:
+                        - .vagrant/
+                        - .git/
+                    auto: 'true'
+                owner: www-data
+                group: www-data
+        usable_port_range:
+            start: 10200
+            stop: 10500
+    ssh:
+        host: null
+        port: null
+        private_key_path: null
+        username: vagrant
+        guest_port: null
+        keep_alive: true
+        forward_agent: false
+        forward_x11: false
+        shell: 'bash -l'
+    vagrant:
+        host: detect
+server:
+    install: '1'
+    packages:
+        - vim
+        - htop
+        - memcached
+        - pv
+users_groups:
+    install: '1'
+    groups: {  }
+    users: {  }
+locale:
+    install: '1'
+    settings:
+        default_locale: ''
+        locales:
+            - en_GB.UTF-8
+            - en_US.UTF-8
+firewall:
+    install: '1'
+    rules: {  }
+cron:
+    install: '1'
+    jobs: {  }
+nginx:
+    install: '0'
+    settings:
+        default_vhost: 1
+        proxy_buffer_size: 128k
+        proxy_buffers: '4 256k'
+    upstreams: {  }
+    vhosts:
+        nxv_bhewbgl8twn7:
+            server_name: awesome.dev
+            server_aliases:
+                - www.awesome.dev
+            www_root: /var/www/awesome
+            listen_port: '80'
+            index_files:
+                - index.html
+                - index.htm
+                - index.php
+            client_max_body_size: 1m
+            ssl: '0'
+            ssl_cert: ''
+            ssl_key: ''
+            ssl_port: ''
+            ssl_protocols: ''
+            ssl_ciphers: ''
+    proxies: {  }
+apache:
+    install: '1'
+    settings:
+        user: www-data
+        group: www-data
+        default_vhost: true
+        manage_user: false
+        manage_group: false
+        sendfile: 0
+    modules:
+        - expires
+        - headers
+        - rewrite
+        - proxy_fcgi
+    vhosts:
+        magento_80:
+            servername: local.magento.com
+            serveraliases:
+                - www.local.magento.com
+            docroot: /www/magento
+            port: '80'
+            setenv:
+                - 'APP_ENV dev'
+            custom_fragment: ''
+            ssl: '0'
+            ssl_cert: ''
+            ssl_key: ''
+            ssl_chain: ''
+            ssl_certs_dir: ''
+            ssl_protocol: ''
+            ssl_cipher: ''
+            directories:
+                avd_ia2qxuj1j0lk:
+                    path: /www/magento
+                    options:
+                        - Indexes
+                        - FollowSymlinks
+                        - MultiViews
+                    allow_override:
+                        - All
+                    require:
+                        - all granted
+                    custom_fragment: ''
+                    provider: directory
+                    files_match:
+                        avdfm_ia2qxuj1j0lk:
+                            path: \.php$
+                            sethandler: 'proxy:fcgi://127.0.0.1:9000'
+                            custom_fragment: ''
+                            provider: filesmatch
+        magento_433:
+            servername: local.magento.com
+            serveraliases:
+                - www.local.magento.com
+            docroot: /www/magento
+            port: '443'
+            setenv:
+                - 'APP_ENV dev'
+            custom_fragment: ''
+            ssl: '1'
+            ssl_cert: "/etc/ssl/certs/ssl-cert-snakeoil.pem"
+            ssl_key: "/etc/ssl/private/ssl-cert-snakeoil.key"
+            ssl_chain: ''
+            ssl_certs_dir: "/etc/ssl/certs"
+            ssl_protocol: 'TLSv1 TLSv1.1 TLSv1.2'
+            ssl_cipher: "ECDHE-RSA-AES256-GCM-SHA384:ECDHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384:    DHE-  RSA-AES128-GCM-SHA256:ECDHE-RSA-AES256-SHA384:ECDHE-RSA-AES128-SHA256:ECDHE-RSA-AES256-SHA:ECDHE-RSA-AES128- SHA:   DHE-RSA-AES256-SHA256:DHE-RSA-AES128-SHA256:DHE-RSA-AES256-SHA:DHE-RSA-AES128-SHA:ECDHE-RSA-DES-CBC3-SHA:   EDH-RSA-  DES-CBC3-SHA:AES256-GCM-SHA384:AES128-GCM-SHA256:AES256-SHA256:AES128-SHA256:AES256-SHA:AES128-SHA:DES-  CBC3-SHA:HIGH:!aNULL:!eNULL:!EXPORT:!DES:!MD5:!PSK:!RC4"
+            directories:
+                avd_xrabq1mgxbtd:
+                    path: /www/magento
+                    options:
+                        - Indexes
+                        - FollowSymlinks
+                        - MultiViews
+                    allow_override:
+                        - All
+                    require:
+                        - all granted
+                    custom_fragment: ''
+                    provider: directory
+                    files_match:
+                        avdfm_xrabq1mgxbtd:
+                            path: \.php$
+                            sethandler: 'proxy:fcgi://127.0.0.1:9000'
+                            custom_fragment: ''
+                            provider: filesmatch
+php:
+    install: '1'
+    settings:
+        version: '56'
+    modules:
+        php:
+            - cli
+            - curl
+            - gd
+            - intl
+            - xmlrpc
+            - mcrypt
+            - memcache
+            - memcached
+            - mysqlnd
+        pear:
+            - PHP_CodeSniffer
+            - SOAP
+        pecl:
+            - imagick
+    ini:
+        display_errors: 'On'
+        error_reporting: '-1'
+        session.save_path: /var/lib/php/session
+    fpm_ini:
+        error_log: /var/log/php-fpm.log
+    fpm_pools:
+        phpfp_kmby92l104xt:
+            ini:
+                prefix: www
+                listen: '127.0.0.1:9000'
+                security.limit_extensions: .php
+                user: www-user
+                group: www-data
+    composer: '1'
+    composer_home: ''
+xdebug:
+    install: '1'
+    settings:
+        xdebug.default_enable: '1'
+        xdebug.remote_autostart: '0'
+        xdebug.remote_connect_back: '1'
+        xdebug.remote_enable: '1'
+        xdebug.remote_handler: dbgp
+        xdebug.remote_port: '9001'
+        xdebug.idekey: vagrant-xdebug
+        xdebug.remote_host: 192.168.56.101
+blackfire:
+    install: '1'
+    settings:
+        server_id: 11193311-6ffe-43f9-b74c-795cf0f0a63e
+        server_token: d35e751b76b6f51b0fcf6015be79d3c1c148ee0d3e9eb4612734ab90aa245c01
+        agent:
+            http_proxy: ''
+            https_proxy: ''
+            log_file: stderr
+            log_level: '1'
+        php:
+            agent_timeout: '0.25'
+            log_file: ''
+            log_level: '1'
+xhprof:
+    install: '0'
+wpcli:
+    install: '0'
+    version: v0.17.1
+drush:
+    install: '0'
+    version: 6.3.0
+ruby:
+    install: '1'
+    versions:
+        rv_mpl1ubtehpfi:
+            version: ''
+python:
+    install: '1'
+    packages: {  }
+    versions:
+        pyenv_wvtqh4uwkk6o:
+            version: 2.6.9
+nodejs:
+    install: '0'
+    npm_packages: {  }
+hhvm:
+    install: '0'
+    nightly: 0
+    composer: '1'
+    composer_home: ''
+    settings: {  }
+    server_ini: {  }
+    php_ini: {  }
+mysql:
+    install: '1'
+    settings:
+        version: '5.5'
+        root_password: root
+        override_options: {  }
+    adminer: '1'
+    users:
+        mysqlnu_bbu4jv7hl8fk:
+            name: admin
+            password: admin
+    databases:
+        mysqlnd_9ivswwpcxv4a:
+            name: magento
+    grants:
+        mysqlng_jm7ycx7swu5g:
+            user: pmemorial
+            table: '*.*'
+            privileges:
+                - ALL
+mariadb:
+    install: '0'
+    settings:
+        version: '10.0'
+        root_password: '123'
+        override_options: {  }
+    adminer: 0
+    users: {  }
+    databases: {  }
+    grants: {  }
+postgresql:
+    install: '0'
+    settings:
+        global:
+            encoding: UTF8
+            version: '9.3'
+        server:
+            postgres_password: ''
+    databases: {  }
+    users: {  }
+    grants: {  }
+    adminer: 0
+mongodb:
+    install: '0'
+    settings:
+        auth: 1
+        bind_ip: 127.0.0.1
+        port: '27017'
+    databases: {  }
+redis:
+    install: '1'
+    settings:
+        conf_port: '6379'
+sqlite:
+    install: '0'
+    adminer: 0
+    databases: {  }
+mailcatcher:
+    install: '1'
+    settings:
+        smtp_ip: 0.0.0.0
+        smtp_port: 1025
+        http_ip: 0.0.0.0
+        http_port: '1080'
+        mailcatcher_path: /usr/local/rvm/wrappers/default
+        from_email_method: inline
+beanstalkd:
+    install: '0'
+    settings:
+        listenaddress: 0.0.0.0
+        listenport: '13000'
+        maxjobsize: '65535'
+        maxconnections: '1024'
+        binlogdir: /var/lib/beanstalkd/binlog
+        binlogfsync: null
+        binlogsize: '10485760'
+    beanstalk_console: 0
+rabbitmq:
+    install: '0'
+    settings:
+        port: '5672'
+    users: {  }
+    vhosts: {  }
+    plugins: {  }
+elastic_search:
+    install: '0'
+    settings:
+        version: 1.4.1
+        java_install: true
+solr:
+    install: '1'
+    settings:
+        version: 3.6.2
+        port: '8984'
+
